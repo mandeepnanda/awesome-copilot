@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-22
+lastUpdated: 2026-11-01
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -941,7 +941,17 @@ Run `/config` to open a dedicated sidebar configuration screen inside the CLI, g
 
 ### Assisted Permissions Guidance
 
-In Assisted permission mode, the `assistedApprovalInstructions` setting lets you supply your own guidance to the permission judge, so confirmation decisions reflect your team's norms (for example, which commands are always safe to run).
+**Assisted Permissions** is the mode where an LLM judge evaluates each tool request and automatically approves requests it considers safe, surfacing only potentially risky actions for manual confirmation. It is available to all users and does not require experimental mode to be enabled — use `/permissions` to switch into Assisted mode directly.
+
+The `assistedApprovalInstructions` setting lets you supply your own guidance to the permission judge, so confirmation decisions reflect your team's norms (for example, which commands are always safe to run):
+
+```json
+{
+  "assistedApprovalInstructions": "Always approve read-only git operations, npm install, and running tests. Ask before any destructive file operations or deploys."
+}
+```
+
+> **Note**: The separate **auto allow-all** mode (activated with `/allow-all auto`) still requires experimental features to be enabled. Assisted Permissions and auto allow-all are two different modes: Assisted asks for confirmation on risky actions, while auto allow-all approves everything.
 
 ### Memory and Session Import
 
@@ -963,6 +973,7 @@ This section collects settings and behaviors that **changed or were renamed** in
 - **Sandbox local network access is now allowed by default.** Earlier releases blocked localhost and private-network access from sandboxed commands. Current releases allow it, so commands can reach local services; turn off **Allow local network** in `/sandbox` if you want the stricter isolation. Linux sandboxing also requires `slirp4netns`, `nsenter`, `iptables`, `ip6tables`, `iptables-restore`, and `ip6tables-restore` on `PATH`.
 - **`copilot plugins` lost its cross-kind flags.** The `--kind`, `--scope`, `--mcp`, and `--skill` flags were removed; `copilot plugins list` is now an alias of `copilot plugin list` and reports only plugins. Scripts using `copilot plugins install --skill [--scope project]` should switch to `copilot skill add [--project]`, and scripts reading `.plugins` from `copilot plugins list --json` should expect a flat array instead of the previous `{ plugins, errors }` object.
 - **Auto allow-all mode requires experimental mode.** The previous `AUTO_APPROVAL` environment variable approach was removed in favor of `/experimental on` (or `--experimental`) plus `/allow-all auto`.
+- **Assisted Permissions no longer requires experimental mode.** Earlier releases required experimental features to be enabled before you could use Assisted permission mode. It is now available to all users directly from `/permissions`.
 - **Ctrl+D no longer queues messages.** It now uses its default terminal behavior; use **Ctrl+Q** or **Ctrl+Enter** to queue a message instead.
 - **The CLI's command-line parser was rewritten** (moving off Commander to a Rust-based grammar). As a result, some error and help wording changed, `copilot login --host` now works correctly, and `--max-autopilot-continues` no longer accepts scientific notation as a value.
 - **Model availability changes over time.** The model picker periodically retires older models; if a model you previously pinned in a custom agent or config disappears from `/model`, switch to a current model or a [family alias](#model-picker) instead.
