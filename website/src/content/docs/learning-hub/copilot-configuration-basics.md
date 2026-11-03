@@ -637,13 +637,14 @@ The `/delegate` command creates a **delegate PR** — a pull request that the co
 
 This is useful when you want to hand off a task to the coding agent on a specific branch — for example, backporting a fix to an older release branch or targeting a long-lived feature branch for automated work.
 
-The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
+Use `/share` to open a full-screen action menu for sharing the current session — from there you can copy a shareable URL, export as HTML, or choose other sharing options. The `/share html` command skips the menu and exports the session directly as a **self-contained interactive HTML file**:
 
 ```
-/share html
+/share          # open the sharing action menu
+/share html     # export directly as an offline-viewable HTML file
 ```
 
-The exported file contains everything needed to view the session without a network connection and can be shared with teammates or stored for later reference. This complements `/share` (which shares via URL) for cases where an offline or attached format is preferred.
+The exported HTML file contains everything needed to view the session without a network connection and can be shared with teammates or stored for later reference.
 
 The `/chronicle` command opens an interactive timeline of everything the agent has done in the current session. It shows file changes, tool calls, and conversation turns in chronological order, letting you review the full arc of the session at a glance:
 
@@ -976,6 +977,7 @@ This section collects settings and behaviors that **changed or were renamed** in
 - **Assisted Permissions no longer requires experimental mode.** Earlier releases required experimental features to be enabled before you could use Assisted permission mode. It is now available to all users directly from `/permissions`.
 - **Ctrl+D no longer queues messages.** It now uses its default terminal behavior; use **Ctrl+Q** or **Ctrl+Enter** to queue a message instead.
 - **The CLI's command-line parser was rewritten** (moving off Commander to a Rust-based grammar). As a result, some error and help wording changed, `copilot login --host` now works correctly, and `--max-autopilot-continues` no longer accepts scientific notation as a value.
+- **`--remote` and `--no-remote` startup flags were retired.** These flags no longer work. Use the clearer `--host` and `--connect` flags instead when you need to control how the CLI starts or connects in hosted or remote contexts.
 - **Model availability changes over time.** The model picker periodically retires older models; if a model you previously pinned in a custom agent or config disappears from `/model`, switch to a current model or a [family alias](#model-picker) instead.
 
 ## Common Questions
