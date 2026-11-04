@@ -431,6 +431,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode |
 | `defaultMode` | Startup mode for new interactive sessions (e.g., `interactive`, `autopilot`, `plan`) |
 | `defaultPermissionMode` | Default approval behaviour for new interactive sessions, independent from `defaultMode` |
+| `fusionTier` | Sets the Fusion compute tier (`low`, `medium`, `high`, `max`) used when the managed `fusion` model is active in Auto mode |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -471,13 +472,7 @@ When you leave plan mode, the CLI automatically reverts to your session model. T
 
 ### CLI Session Commands
 
-The `/settings` command opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
-
-```
-/settings
-```
-
-The settings dialog supports search — type to filter settings by name. Changes take effect immediately.
+The `/settings` command opens a **unified dashboard** that consolidates all settings — user, repository, and local — in a single screen with **global search** across settings and local resources. Type to filter settings by name; changes take effect immediately.
 
 The `/settings` command and the `/model` command both support **`--repo` and `--local` flags** for explicitly scoping which layer of settings you want to view or edit:
 
@@ -574,6 +569,12 @@ The `/cd` command changes the working directory for the current session. The wor
 ```
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
+
+The `/code` command opens the current session's working directory in **VS Code**, keeping the terminal session active. This is handy when you've been using Copilot CLI to set up or change a project and want to jump into VS Code to review or continue work visually:
+
+```
+/code
+```
 
 The `/worktree` command (also aliased `/move`) creates a new git worktree and switches into it, moving any uncommitted changes along. This lets you start working on a parallel branch without leaving your current terminal session:
 
