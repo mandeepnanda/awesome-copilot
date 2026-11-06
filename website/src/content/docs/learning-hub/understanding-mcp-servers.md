@@ -72,6 +72,8 @@ MCP servers are configured per-workspace. GitHub Copilot CLI discovers server de
 
 > **Security**: Workspace MCP servers are loaded **only after folder trust is confirmed**. If you haven't explicitly trusted a folder, servers defined in its config files won't start — protecting you from malicious MCP server configurations in untrusted repositories.
 
+> **Working directory for local MCP servers**: By default, local MCP server processes start in the CLI session's working directory. If your MCP servers need a different root — for example, a monorepo root different from where you launched the CLI — set the `COPILOT_SESSION_CWD` environment variable. Relative `cwd` values and path arguments in server configs are expanded relative to `COPILOT_SESSION_CWD` when it is set, letting you share a single config across team members regardless of where they launch the CLI.
+
 Example `.mcp.json` or `.vscode/mcp.json`:
 
 ```json

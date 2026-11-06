@@ -456,7 +456,7 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Auto mode and server-side model routing**: When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
-**Model family aliases**: Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string. Current models include **Claude Opus 5** and **Claude Fable 5.1** (Anthropic), **Grok 4.5** and **Grok 4.6** (xAI, with `xhigh` reasoning effort support), **Gemini 3.7 Flash** (Google), and **GPT-6 Astra** (OpenAI). The model picker also periodically retires older models no longer worth recommending, so don't be surprised if a model you previously pinned disappears from the list — check [Compatibility and Migration Notes](#compatibility-and-migration-notes) if that happens.
+**Model family aliases**: Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string. Current models include **Claude Opus 5** and **Claude Fable 5.1** (Anthropic), **Grok 4.5** and **Grok 4.6** (xAI, with `xhigh` reasoning effort support), **Gemini 3.7 Flash** (Google), and **GPT-6 Astra** and **GPT-6.1 Terra** (OpenAI). The model picker also periodically retires older models no longer worth recommending, so don't be surprised if a model you previously pinned disappears from the list — check [Compatibility and Migration Notes](#compatibility-and-migration-notes) if that happens.
 
 **Model fallback lists**: Custom agents can set `model` to a list of several models instead of a single name. Copilot tries each one in order until it finds one available to your account — useful when your preferred model is temporarily rate-limited or not enrolled. Pair this with `model-policy: required` to keep the agent restricted to that list even if you try to switch models mid-session. See [Building Custom Agents](../building-custom-agents/) for the frontmatter syntax.
 
@@ -533,6 +533,8 @@ With the sidebar open, you can see all running and backgrounded sessions in a sp
 **Sidebar sort order**: The split Sessions sidebar supports **Recent**, **Created**, **Name**, and classic **None** sorting so you can order the list the way that fits your workflow. Your chosen order is remembered across CLI restarts.
 
 **Windows 11 taskbar status**: On Windows 11, running Copilot CLI sessions appear in the taskbar with live hover status cards, so you can check on a background session's progress without switching back to its terminal window.
+
+**Session management tools and @mentions**: When you opt in to session management tools in `/settings`, a set of built-in session-management tools (`list_sessions`, `switch_session`, etc.) becomes available to the agent, letting it coordinate across sessions programmatically during complex multi-session workflows. You can also enable **@mention support for local sessions** — once opted in, active local sessions appear in the `@mention` picker so you can reference them directly in prompts (for example, `@my-backend-session`) to send cross-session messages or query another session's context. Both features are opt-in; enable them in `/settings` under **Sessions**.
 
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history. You can also trigger it by pressing **double-Esc**:
 
@@ -837,6 +839,8 @@ These flags apply only to the current invocation — your persisted sandbox pref
 
 **`worktreeBaseRef` setting**: Controls whether `/worktree`, `/worktree new`, and the `--worktree` startup flag create the new worktree from `HEAD` or from the remote default branch. All three default to `HEAD`. Set this in `/settings` if you want worktrees to branch from the remote default instead.
 
+**Sandbox extensions setting**: When the sandbox is enabled, extension processes (plugins running as subprocess extensions) run inside the sandbox by default, inheriting the same filesystem and network restrictions as sandboxed shell commands. You can opt out of sandboxing extensions in `/settings` if an extension requires access to resources blocked by the sandbox (for example, a local model server or a native binary not on the allow-list). Sandboxing extensions is the safer default — only disable it for extensions you trust and that have a concrete need for broader access.
+
 **Sandbox network isolation**: On macOS and Linux, sandboxed commands cannot reach services running on your own machine, including a server the sandboxed command itself starts on `127.0.0.1`. This means test suites that bind a local port will fail inside the sandbox. Turn on **Allow local network** in `/sandbox` to restore access to localhost. On Linux, sandboxing also requires `slirp4netns`, `nsenter`, `iptables`, `ip6tables`, `iptables-restore`, and `ip6tables-restore` on `PATH` — install these if sandboxed commands start failing to launch. Additionally, Linux sandboxes restrict network egress to the configured HTTP(S) proxy when one is set; this proxy mode requires `slirp4netns`, `util-linux` 2.35+, `iptables`, and `/dev/net/tun` access.
 
 The `--attachment` flag (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
@@ -871,6 +875,15 @@ copilot --config-dir ~/.my-copilot-config
 ```
 
 Set `COPILOT_HOME` in your shell profile to use a custom config directory across all sessions. This is especially useful when running multiple Copilot configurations for different projects or teams.
+
+The `COPILOT_SESSION_CWD` environment variable overrides the working directory used when launching LSP and local MCP server processes. By default, these processes start in the session's working directory. Set this variable when your language server or MCP server needs to start from a specific root (for example, a monorepo root different from the directory where you launch Copilot CLI):
+
+```bash
+export COPILOT_SESSION_CWD=~/projects/monorepo-root
+copilot
+```
+
+`COPILOT_SESSION_CWD` also applies to paths in LSP and local MCP config files: relative `cwd` values and `args` that reference project paths are expanded relative to this directory rather than the session CWD. This lets you keep shared configs in the repository that work regardless of where team members launch the CLI.
 
 ### Shell Completion
 

@@ -267,7 +267,7 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 |----------|-------------------|
 | Most demanding reasoning, security review | Claude Sonnet 5 |
 | Complex reasoning, analysis | Claude Sonnet 4 |
-| Code generation, tool-driven agentic work | GPT-5.6 |
+| Code generation, tool-driven agentic work | GPT-5.6 or GPT-6.1 Terra |
 | Code generation, refactoring | GPT-4.1 |
 | Code-specialized tasks, large context | kimi-k2.7-code, kimi-k3 |
 | Quick analysis, simple tasks | Claude Haiku or GPT-4.1-mini |
