@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-12
+lastUpdated: 2026-11-02
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -201,6 +201,27 @@ When an agent delegates work to multiple chats, VS Code's **Agents window** now 
 This pairs with **improved workspace resolution**: agents can resolve a workspace by project name (for example, "run this in the vscode workspace") in addition to absolute paths, which simplifies prompts that hand off work across multiple repositories.
 
 **Shareable session links** *(VS Code 1.138+)*: Agent Host sessions and chats now provide browser-addressable links, so you can reopen or share a specific Agents window session directly from another app, a GitHub issue, or terminal output — useful when handing off a delegated subagent's work to a teammate for review. You can also start a new session beside the current one in one step, keeping the current work visible while a second session starts.
+
+## Session management tools and @mentions (Copilot CLI)
+
+Copilot CLI exposes an opt-in set of **session management tools** that let agents and ACP clients manage local sessions programmatically — listing, resuming, and inspecting sessions without leaving an active conversation. Once a local session is opted in, it also becomes **@mentionable** inside other sessions, so one agent can reference and cross-link to another running session by name.
+
+To opt in a session for external management, enable it from inside the session:
+
+```
+/session share        # opt this session in to external management and @mentions
+/session unshare      # remove this session from external management
+```
+
+When a session is shared, ACP clients (tools like Zed, Neovim plugins, and IDE integrations built on the Agent Coordination Protocol) can include it in session listings, attach to it, and display its progress. The session also becomes @mentionable in other CLI sessions, enabling cross-session references:
+
+```
+@my-backend-session show me the current error output
+```
+
+This is particularly useful in multi-agent workflows where a coordinating agent needs to observe or steer a subordinate session, or when you want to track several long-running background sessions simultaneously.
+
+> **Note**: Session sharing is opt-in by default. Local sessions are not exposed to external management unless you explicitly share them, keeping unrelated sessions private.
 
 ## Common questions
 
