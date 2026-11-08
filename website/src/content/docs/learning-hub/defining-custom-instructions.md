@@ -3,7 +3,7 @@ title: 'Defining Custom Instructions'
 description: 'Learn how to create persistent, context-aware instructions that guide GitHub Copilot automatically across your codebase.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-01
+lastUpdated: 2026-11-08
 estimatedReadingTime: '8 minutes'
 tags:
   - instructions
@@ -97,6 +97,24 @@ export function UserProfile({ userId, onUpdate }: UserProfileProps) {
 - Copilot reads these instructions whenever it generates or suggests code for matching files
 - Standards are enforced consistently without developers needing to remember every rule
 - New team members benefit from institutional knowledge automatically
+
+## Where to Store Instructions
+
+Store instruction files in your repository's `.github/instructions/` directory:
+
+```
+.github/
+└── instructions/
+    ├── typescript-standards.instructions.md
+    ├── react-components.instructions.md
+    └── security-policy.instructions.md
+```
+
+All `.instructions.md` files in `.github/instructions/` (including subdirectories) are automatically discovered and loaded based on their `applyTo` patterns. There is no manual registration step.
+
+**Agent-driven file edits apply instructions too**: When the Copilot coding agent reads or edits a file, it automatically picks up any instruction whose `applyTo` pattern matches that file — the same as when you're working interactively in chat or using inline completions. This means your instructions enforce standards not just during manual development but also during autonomous agentic sessions.
+
+> **Tip**: Some editors let you customize the search paths for instruction files. The `.github/instructions/` directory is the canonical location that works across all Copilot clients, including VS Code, Copilot CLI, and the coding agent.
 
 ## Scoping Instructions Effectively
 
