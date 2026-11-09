@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-11-02
+lastUpdated: 2026-11-09
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -121,6 +121,19 @@ This guided flow is the recommended way to add new MCP servers, especially for s
 **args**: Arguments passed to the command. Most MCP servers are distributed as npm packages and can be run with `npx -y`.
 
 **env**: Environment variables passed to the server process. Use these for connection strings, API keys, and configuration—never hardcode secrets in the JSON file.
+
+> **Env values are passed literally in interactive sessions**: In an interactive CLI session, values in the `env` field are passed to the MCP server process exactly as written — they are **not** automatically expanded from your host environment. To reference a value from your host environment, use `${NAME}` syntax explicitly:
+>
+> ```json
+> {
+>   "env": {
+>     "DATABASE_URL": "${DATABASE_URL}",
+>     "API_KEY": "${MY_API_KEY}"
+>   }
+> }
+> ```
+>
+> Without the `${NAME}` reference, the literal string (for example `"${DATABASE_URL}"` vs a hardcoded value) is what the server receives. This also applies to SDK sessions. Use `${input:variableName}` for values you want VS Code to prompt for at runtime.
 
 **type** (remote servers): The transport type for remote MCP servers (`http` or `sse`). This field can now be omitted — the CLI defaults to `http` when no type is specified, simplifying remote server configuration.
 

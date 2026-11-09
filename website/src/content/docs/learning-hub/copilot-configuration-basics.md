@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-11-01
+lastUpdated: 2026-11-09
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -966,11 +966,27 @@ The `assistedApprovalInstructions` setting lets you supply your own guidance to 
 }
 ```
 
+> **Autopilot + Assisted Permissions**: When Autopilot mode is active and Assisted Permissions is the current permission mode, the agent no longer pauses for permission prompts — the Assisted judge handles each tool request automatically without surfacing dialogs. Risky actions the judge declines are reported in the session output, letting the agent try an alternative approach without blocking. This means you can run long Autopilot sessions with the safety net of the Assisted judge without any manual intervention.
+
 > **Note**: The separate **auto allow-all** mode (activated with `/allow-all auto`) still requires experimental features to be enabled. Assisted Permissions and auto allow-all are two different modes: Assisted asks for confirmation on risky actions, while auto allow-all approves everything.
 
 ### Memory and Session Import
 
 Session and memory import commands accept the semantic JSONL interchange format, making it possible to bring saved session history or memory entries into Copilot CLI from an external export rather than starting from scratch.
+
+### Semantic Code Search Indexing
+
+The `/index` command manages **managed shared semantic code search indexing** for your repository. When indexing is enabled and your account is eligible, the CLI maintains a shared search index that powers the `codebase` tool's semantic search capabilities — finding code by meaning rather than just text matching.
+
+```
+/index         # check indexing status and configure
+/index start   # start indexing the current repository
+/index stop    # stop indexing
+```
+
+Managed shared tgrep indexing is enabled by default for eligible repositories. Use `/index` to inspect the current indexing state and troubleshoot if semantic search is not returning expected results. The index is stored centrally and shared across sessions, so you do not need to rebuild it each time you start a new session.
+
+> **When is indexing used?** When the `codebase` search tool runs a semantic query, it checks whether a repository index is available. If an index exists, results draw on the semantic index for richer matches. If no index is ready, the tool falls back to ripgrep-based text search. Indexing is most beneficial in large codebases where text search misses conceptually related code spread across many files.
 
 ### Command-Line Parsing
 
