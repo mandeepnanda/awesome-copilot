@@ -3,7 +3,7 @@ title: 'Defining Custom Instructions'
 description: 'Learn how to create persistent, context-aware instructions that guide GitHub Copilot automatically across your codebase.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-11-08
+lastUpdated: 2026-11-12
 estimatedReadingTime: '8 minutes'
 tags:
   - instructions
@@ -114,7 +114,9 @@ All `.instructions.md` files in `.github/instructions/` (including subdirectorie
 
 **Agent-driven file edits apply instructions too**: When the Copilot coding agent reads or edits a file, it automatically picks up any instruction whose `applyTo` pattern matches that file — the same as when you're working interactively in chat or using inline completions. This means your instructions enforce standards not just during manual development but also during autonomous agentic sessions.
 
-> **Tip**: Some editors let you customize the search paths for instruction files. The `.github/instructions/` directory is the canonical location that works across all Copilot clients, including VS Code, Copilot CLI, and the coding agent.
+**`.claude/rules` as an alternative location**: GitHub Copilot CLI also discovers instruction files placed in a `.claude/rules/` directory at your project root. Files there follow the same `.instructions.md` format and `applyTo` scoping as files in `.github/instructions/`. Use `.claude/rules/` when your project already uses Claude Code conventions and you want a single set of instruction files that works across both tools without duplicating them.
+
+> **Tip**: Some editors let you customize the search paths for instruction files. The `.github/instructions/` directory is the canonical location that works across all Copilot clients, including VS Code, Copilot CLI, and the coding agent. The `.claude/rules/` path is specific to Copilot CLI (and Claude Code).
 
 ## Scoping Instructions Effectively
 

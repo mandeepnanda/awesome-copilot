@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-11-10
+lastUpdated: 2026-11-12
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -845,6 +845,8 @@ These flags apply only to the current invocation — your persisted sandbox pref
 
 **Sandbox extensions setting**: When the sandbox is enabled, extension processes (plugins running as subprocess extensions) run inside the sandbox by default, inheriting the same filesystem and network restrictions as sandboxed shell commands. You can opt out of sandboxing extensions in `/settings` if an extension requires access to resources blocked by the sandbox (for example, a local model server or a native binary not on the allow-list). Sandboxing extensions is the safer default — only disable it for extensions you trust and that have a concrete need for broader access.
 
+**`sandbox.userPolicy.filesystem.enumeratePaths` (Windows)**: On Windows, you can grant sandboxed processes the ability to list (enumerate) a directory without granting full read access to its files. Set this in `settings.json` to a list of directory paths that sandboxed commands may enumerate. This is useful for tooling that needs to discover project structure without reading file contents — for example, build tools that scan for source directories before reading individual files.
+
 **Sandbox network isolation**: On macOS and Linux, sandboxed commands cannot reach services running on your own machine, including a server the sandboxed command itself starts on `127.0.0.1`. This means test suites that bind a local port will fail inside the sandbox. Turn on **Allow local network** in `/sandbox` to restore access to localhost. On Linux, sandboxing also requires `slirp4netns`, `nsenter`, `iptables`, `ip6tables`, `iptables-restore`, and `ip6tables-restore` on `PATH` — install these if sandboxed commands start failing to launch. Additionally, Linux sandboxes restrict network egress to the configured HTTP(S) proxy when one is set; this proxy mode requires `slirp4netns`, `util-linux` 2.35+, `iptables`, and `/dev/net/tun` access.
 
 The `--attachment` flag (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
@@ -977,6 +979,17 @@ The `assistedApprovalInstructions` setting lets you supply your own guidance to 
 ### Memory and Session Import
 
 Session and memory import commands accept the semantic JSONL interchange format, making it possible to bring saved session history or memory entries into Copilot CLI from an external export rather than starting from scratch.
+
+### Release Notes and Changelog
+
+The `/changelog` command lets you view release notes directly inside the CLI. Without arguments it shows the notes for the current build; pass a version number to retrieve notes for any other release — including versions older than the ones bundled with the CLI:
+
+```
+/changelog           # view release notes for the current CLI version
+/changelog 1.0.105   # retrieve release notes for a specific version
+```
+
+This is useful when you upgrade and want to review what changed, or when you need to audit when a specific behavior was introduced without leaving your terminal session.
 
 ### Semantic Code Search Indexing
 
