@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-22
+lastUpdated: 2026-11-09
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -72,6 +72,8 @@ MCP servers are configured per-workspace. GitHub Copilot CLI discovers server de
 
 > **Security**: Workspace MCP servers are loaded **only after folder trust is confirmed**. If you haven't explicitly trusted a folder, servers defined in its config files won't start — protecting you from malicious MCP server configurations in untrusted repositories.
 
+> **Working directory for local MCP servers**: By default, local MCP server processes start in the CLI session's working directory. If your MCP servers need a different root — for example, a monorepo root different from where you launched the CLI — set the `COPILOT_SESSION_CWD` environment variable. Relative `cwd` values and path arguments in server configs are expanded relative to `COPILOT_SESSION_CWD` when it is set, letting you share a single config across team members regardless of where they launch the CLI.
+
 Example `.mcp.json` or `.vscode/mcp.json`:
 
 ```json
@@ -119,6 +121,19 @@ This guided flow is the recommended way to add new MCP servers, especially for s
 **args**: Arguments passed to the command. Most MCP servers are distributed as npm packages and can be run with `npx -y`.
 
 **env**: Environment variables passed to the server process. Use these for connection strings, API keys, and configuration—never hardcode secrets in the JSON file.
+
+> **Env values are passed literally in interactive sessions**: In an interactive CLI session, values in the `env` field are passed to the MCP server process exactly as written — they are **not** automatically expanded from your host environment. To reference a value from your host environment, use `${NAME}` syntax explicitly:
+>
+> ```json
+> {
+>   "env": {
+>     "DATABASE_URL": "${DATABASE_URL}",
+>     "API_KEY": "${MY_API_KEY}"
+>   }
+> }
+> ```
+>
+> Without the `${NAME}` reference, the literal string (for example `"${DATABASE_URL}"` vs a hardcoded value) is what the server receives. This also applies to SDK sessions. Use `${input:variableName}` for values you want VS Code to prompt for at runtime.
 
 **type** (remote servers): The transport type for remote MCP servers (`http` or `sse`). This field can now be omitted — the CLI defaults to `http` when no type is specified, simplifying remote server configuration.
 
@@ -370,10 +385,73 @@ A: There's no hard limit, but each server is a running process. Configure only t
 
 A: No. Copilot CLI automatically detects Azure DevOps repositories and disables the built-in GitHub MCP server for those sessions. This prevents irrelevant GitHub API calls when your project is hosted on Azure DevOps. Other MCP servers you have configured are unaffected.
 
+## Running Copilot CLI as a Headless Server
+
+You can run Copilot CLI as a headless server inside a container, which lets SDK clients connect to it over TCP without needing the CLI installed locally. This is useful for running the agent in CI jobs, Kubernetes pods, or any environment where you want to isolate the agent runtime from the machine running your application.
+
+A container image is published to the GitHub Container Registry for every Copilot CLI release:
+
+```text
+ghcr.io/github/copilot-cli
+```
+
+### Quick Start
+
+Start the server with a secret that clients must present and a GitHub token for Copilot access:
+
+```sh
+export COPILOT_CONNECTION_TOKEN="$(openssl rand -hex 32)"
+
+docker run --rm \
+  -p 127.0.0.1:4321:4321 \
+  -e COPILOT_CONNECTION_TOKEN \
+  -e COPILOT_GITHUB_TOKEN \
+  ghcr.io/github/copilot-cli:latest
+```
+
+Then connect with any [Copilot SDK](https://github.com/github/copilot-sdk) client. For example, using the Node.js SDK:
+
+```js
+import { CopilotClient, RuntimeConnection } from "@github/copilot-sdk";
+
+const client = new CopilotClient({
+  connection: RuntimeConnection.forUri("localhost:4321", {
+    connectionToken: process.env.COPILOT_CONNECTION_TOKEN,
+  }),
+});
+
+await client.start();
+console.log(await client.ping("hello"));
+await client.stop();
+```
+
+### Key Configuration
+
+| Variable | Description |
+|----------|-------------|
+| `COPILOT_CONNECTION_TOKEN` | Required. Secret clients must present to connect. |
+| `COPILOT_PORT` | Port the server listens on inside the container (default: `4321`). |
+| `COPILOT_GITHUB_TOKEN` | GitHub token used to authenticate with Copilot. |
+
+Mount your project at `/home/copilot/workspace` so the agent can work on it. Mount a volume at `/home/copilot/.copilot` to persist configuration across containers.
+
+The container runs as a non-root user (`copilot`, uid 10001). Bind mounts must be writable by that user. Git is configured to trust the workspace path even when the mounted repository is owned by a different host UID.
+
+> **Security**: Publish the port on loopback (`-p 127.0.0.1:4321:4321`) or an isolated container network. The connection is plain TCP — keep traffic on a trusted network or terminate TLS in front of the container.
+
+Images are published for `linux/amd64` and `linux/arm64`. For builds that must never change, reference the image by digest rather than the mutable `latest` tag. Build provenance attestations are available:
+
+```sh
+gh attestation verify oci://ghcr.io/github/copilot-cli:latest --repo github/copilot-cli
+```
+
+See the [container README](https://github.com/github/copilot-cli/tree/main/container) for full configuration details and build instructions.
+
 ## Next Steps
 
 - **Build Agents**: [Building Custom Agents](../building-custom-agents/) — Create agents that leverage MCP tools
 - **Explore Examples**: Browse the [Agents Directory](../../agents/) for agents built around MCP server integrations
 - **Protocol Deep Dive**: [MCP Specification](https://spec.modelcontextprotocol.io/) — Learn the protocol details for building your own servers
+- **Copilot SDK**: [github/copilot-sdk](https://github.com/github/copilot-sdk) — Build applications that connect to the Copilot agent runtime
 
 ---

@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-22
+lastUpdated: 2026-11-12
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -431,6 +431,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode |
 | `defaultMode` | Startup mode for new interactive sessions (e.g., `interactive`, `autopilot`, `plan`) |
 | `defaultPermissionMode` | Default approval behaviour for new interactive sessions, independent from `defaultMode` |
+| `fusionTier` | Sets the Fusion compute tier (`low`, `medium`, `high`, `max`) used when the managed `fusion` model is active in Auto mode |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -455,7 +456,7 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Auto mode and server-side model routing**: When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
-**Model family aliases**: Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string. Current models include **Claude Opus 5** and **Claude Fable 5.1** (Anthropic), **Grok 4.5** and **Grok 4.6** (xAI, with `xhigh` reasoning effort support), **Gemini 3.7 Flash** (Google), and **GPT-6 Astra** (OpenAI). The model picker also periodically retires older models no longer worth recommending, so don't be surprised if a model you previously pinned disappears from the list — check [Compatibility and Migration Notes](#compatibility-and-migration-notes) if that happens.
+**Model family aliases**: Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string. Current models include **Claude Opus 5** and **Claude Fable 5.2** (Anthropic), **Grok 4.5** and **Grok 4.6** (xAI, with `xhigh` reasoning effort support), **Gemini 3.7 Flash** (Google), and **GPT-6 Astra** and **GPT-6.1 Terra** (OpenAI). The model picker also periodically retires older models no longer worth recommending, so don't be surprised if a model you previously pinned disappears from the list — check [Compatibility and Migration Notes](#compatibility-and-migration-notes) if that happens.
 
 **Model fallback lists**: Custom agents can set `model` to a list of several models instead of a single name. Copilot tries each one in order until it finds one available to your account — useful when your preferred model is temporarily rate-limited or not enrolled. Pair this with `model-policy: required` to keep the agent restricted to that list even if you try to switch models mid-session. See [Building Custom Agents](../building-custom-agents/) for the frontmatter syntax.
 
@@ -471,13 +472,7 @@ When you leave plan mode, the CLI automatically reverts to your session model. T
 
 ### CLI Session Commands
 
-The `/settings` command opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
-
-```
-/settings
-```
-
-The settings dialog supports search — type to filter settings by name. Changes take effect immediately.
+The `/settings` command opens a **unified dashboard** that consolidates all settings — user, repository, and local — in a single screen with **global search** across settings and local resources. Type to filter settings by name; changes take effect immediately.
 
 The `/settings` command and the `/model` command both support **`--repo` and `--local` flags** for explicitly scoping which layer of settings you want to view or edit:
 
@@ -539,6 +534,8 @@ With the sidebar open, you can see all running and backgrounded sessions in a sp
 
 **Windows 11 taskbar status**: On Windows 11, running Copilot CLI sessions appear in the taskbar with live hover status cards, so you can check on a background session's progress without switching back to its terminal window.
 
+**Session management tools and @mentions**: When you opt in to session management tools in `/settings`, a set of built-in session-management tools (`list_sessions`, `switch_session`, etc.) becomes available to the agent, letting it coordinate across sessions programmatically during complex multi-session workflows. You can also enable **@mention support for local sessions** — once opted in, active local sessions appear in the `@mention` picker so you can reference them directly in prompts (for example, `@my-backend-session`) to send cross-session messages or query another session's context. Both features are opt-in; enable them in `/settings` under **Sessions**.
+
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history. You can also trigger it by pressing **double-Esc**:
 
 ```
@@ -574,6 +571,12 @@ The `/cd` command changes the working directory for the current session. The wor
 ```
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
+
+The `/code` command opens the current session's working directory in **VS Code**, keeping the terminal session active. This is handy when you've been using Copilot CLI to set up or change a project and want to jump into VS Code to review or continue work visually:
+
+```
+/code
+```
 
 The `/worktree` command (also aliased `/move`) creates a new git worktree and switches into it, moving any uncommitted changes along. This lets you start working on a parallel branch without leaving your current terminal session:
 
@@ -637,13 +640,14 @@ The `/delegate` command creates a **delegate PR** — a pull request that the co
 
 This is useful when you want to hand off a task to the coding agent on a specific branch — for example, backporting a fix to an older release branch or targeting a long-lived feature branch for automated work.
 
-The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
+Use `/share` to open a full-screen action menu for sharing the current session — from there you can copy a shareable URL, export as HTML, or choose other sharing options. The `/share html` command skips the menu and exports the session directly as a **self-contained interactive HTML file**:
 
 ```
-/share html
+/share          # open the sharing action menu
+/share html     # export directly as an offline-viewable HTML file
 ```
 
-The exported file contains everything needed to view the session without a network connection and can be shared with teammates or stored for later reference. This complements `/share` (which shares via URL) for cases where an offline or attached format is preferred.
+The exported HTML file contains everything needed to view the session without a network connection and can be shared with teammates or stored for later reference.
 
 The `/chronicle` command opens an interactive timeline of everything the agent has done in the current session. It shows file changes, tool calls, and conversation turns in chronological order, letting you review the full arc of the session at a glance:
 
@@ -713,11 +717,13 @@ The `/usage` command displays session metrics such as the number of tokens consu
 /usage
 ```
 
-**`/limits predict`**: Usage-based billing users can run `/limits predict` to get a suggested AI-credit limit for the current session, based on the credit consumption of similar past sessions. This helps you set a realistic `sessionLimits` value ahead of a large task instead of guessing:
+**`/limits predict`**: Usage-based billing users can run `/limits predict` to get a suggested AI-credit limit for the current session, based the credit consumption of similar past sessions. This helps you set a realistic `sessionLimits` value ahead of a large task instead of guessing:
 
 ```
 /limits predict
 ```
+
+> **AI credit top-up**: When a session approaches 90% of its configured AI-credit limit, Copilot offers a one-click top-up so the agent can continue working without interruption. This is especially useful during long Autopilot sessions where you do not want to restart mid-task just to raise a limit.
 
 The `/compact` command summarizes the conversation history to free up context window space while preserving the thread of the conversation. Use it when your context is getting full but you do not want to start a fresh session:
 
@@ -766,6 +772,8 @@ Use `/autopilot` when you want to flip between supervised and unsupervised opera
 > **Enhanced autopilot**: When autopilot mode is active — including when launched with `--autopilot` at startup or during automatic continuation turns — the agent automatically handles elicitation dialogs, `ask_user` prompts, sampling requests, and permission prompts without surfacing them as interactive dialogs. This means long-running automated sessions can proceed end-to-end without manual confirmation steps.
 
 > **Auto allow-all mode**: In addition to the standard allow-all mode (which approves everything), the CLI supports an **auto allow-all** mode that uses an LLM judge to evaluate each tool request. When enabled, the judge automatically approves requests it evaluates as acceptable, and asks you for manual confirmation only for requests it considers risky. This gives you a middle ground between full autopilot and fully supervised operation — most routine actions proceed automatically while unusual or potentially dangerous actions still surface for your review. This mode requires experimental features to be enabled — use `/experimental on` or start the CLI with `--experimental` — then activate it with `/allow-all auto`. See [Compatibility and Migration Notes](#compatibility-and-migration-notes) if you previously relied on the `AUTO_APPROVAL` environment variable for this.
+
+> **Experimental: masked password prompts**: When experimental features are enabled (`/experimental on`), agent commands that require a git, SSH, or sudo password receive a masked dialog instead of failing silently or stalling the turn. The agent can enter the credential in the dialog, keeping secrets out of the session transcript and unblocking operations that would otherwise time out.
 
 > **Read-only `gh` CLI commands**: Read-only `gh` commands — such as `gh issue list`, `gh pr view`, `gh run status`, and other commands that don't write to GitHub — are **automatically approved** without a permission prompt. Only commands that write to GitHub (like creating issues, merging PRs) still require explicit approval. This reduces friction during exploratory sessions where you frequently check issue or PR status.
 
@@ -835,6 +843,10 @@ These flags apply only to the current invocation — your persisted sandbox pref
 
 **`worktreeBaseRef` setting**: Controls whether `/worktree`, `/worktree new`, and the `--worktree` startup flag create the new worktree from `HEAD` or from the remote default branch. All three default to `HEAD`. Set this in `/settings` if you want worktrees to branch from the remote default instead.
 
+**Sandbox extensions setting**: When the sandbox is enabled, extension processes (plugins running as subprocess extensions) run inside the sandbox by default, inheriting the same filesystem and network restrictions as sandboxed shell commands. You can opt out of sandboxing extensions in `/settings` if an extension requires access to resources blocked by the sandbox (for example, a local model server or a native binary not on the allow-list). Sandboxing extensions is the safer default — only disable it for extensions you trust and that have a concrete need for broader access.
+
+**`sandbox.userPolicy.filesystem.enumeratePaths` (Windows)**: On Windows, you can grant sandboxed processes the ability to list (enumerate) a directory without granting full read access to its files. Set this in `settings.json` to a list of directory paths that sandboxed commands may enumerate. This is useful for tooling that needs to discover project structure without reading file contents — for example, build tools that scan for source directories before reading individual files.
+
 **Sandbox network isolation**: On macOS and Linux, sandboxed commands cannot reach services running on your own machine, including a server the sandboxed command itself starts on `127.0.0.1`. This means test suites that bind a local port will fail inside the sandbox. Turn on **Allow local network** in `/sandbox` to restore access to localhost. On Linux, sandboxing also requires `slirp4netns`, `nsenter`, `iptables`, `ip6tables`, `iptables-restore`, and `ip6tables-restore` on `PATH` — install these if sandboxed commands start failing to launch. Additionally, Linux sandboxes restrict network egress to the configured HTTP(S) proxy when one is set; this proxy mode requires `slirp4netns`, `util-linux` 2.35+, `iptables`, and `/dev/net/tun` access.
 
 The `--attachment` flag (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
@@ -869,6 +881,15 @@ copilot --config-dir ~/.my-copilot-config
 ```
 
 Set `COPILOT_HOME` in your shell profile to use a custom config directory across all sessions. This is especially useful when running multiple Copilot configurations for different projects or teams.
+
+The `COPILOT_SESSION_CWD` environment variable overrides the working directory used when launching LSP and local MCP server processes. By default, these processes start in the session's working directory. Set this variable when your language server or MCP server needs to start from a specific root (for example, a monorepo root different from the directory where you launch Copilot CLI):
+
+```bash
+export COPILOT_SESSION_CWD=~/projects/monorepo-root
+copilot
+```
+
+`COPILOT_SESSION_CWD` also applies to paths in LSP and local MCP config files: relative `cwd` values and `args` that reference project paths are expanded relative to this directory rather than the session CWD. This lets you keep shared configs in the repository that work regardless of where team members launch the CLI.
 
 ### Shell Completion
 
@@ -933,7 +954,7 @@ Run `/config` to open a dedicated sidebar configuration screen inside the CLI, g
 
 ### Sandbox Network Allow/Deny Rules
 
-`/sandbox` supports per-host network allow/deny rules that layer on top of your configured upstream proxy, instead of replacing it. This lets you permit or block specific hosts for sandboxed commands without reconfiguring your whole proxy setup — useful when a sandboxed build or test needs to reach one extra domain (like a package registry mirror) while keeping the rest of your network policy intact.
+`/sandbox` supports per-host network allow/deny rules that layer on top of your configured upstream proxy, instead of replacing it. This lets you permit or block specific hosts for sandboxed commands without reconfiguring your whole proxy setup — useful when a sandboxed build or test needs to reach one extra domain (like a package registry mirror) while keeping the rest of your network policy intact. Host rules accept both hostnames and IPv4/IPv6 CIDR ranges, so you can allow or deny entire subnets in addition to individual hosts.
 
 ### Sandbox Session Control
 
@@ -941,11 +962,48 @@ Run `/config` to open a dedicated sidebar configuration screen inside the CLI, g
 
 ### Assisted Permissions Guidance
 
-In Assisted permission mode, the `assistedApprovalInstructions` setting lets you supply your own guidance to the permission judge, so confirmation decisions reflect your team's norms (for example, which commands are always safe to run).
+**Assisted Permissions** is the mode where an LLM judge evaluates each tool request and automatically approves requests it considers safe, surfacing only potentially risky actions for manual confirmation. It is available to all users and does not require experimental mode to be enabled — use `/permissions` to switch into Assisted mode directly.
+
+The `assistedApprovalInstructions` setting lets you supply your own guidance to the permission judge, so confirmation decisions reflect your team's norms (for example, which commands are always safe to run):
+
+```json
+{
+  "assistedApprovalInstructions": "Always approve read-only git operations, npm install, and running tests. Ask before any destructive file operations or deploys."
+}
+```
+
+> **Autopilot + Assisted Permissions**: When Autopilot mode is active and Assisted Permissions is the current permission mode, the agent no longer pauses for permission prompts — the Assisted judge handles each tool request automatically without surfacing dialogs. Risky actions the judge declines are reported in the session output, letting the agent try an alternative approach without blocking. This means you can run long Autopilot sessions with the safety net of the Assisted judge without any manual intervention.
+
+> **Note**: The separate **auto allow-all** mode (activated with `/allow-all auto`) still requires experimental features to be enabled. Assisted Permissions and auto allow-all are two different modes: Assisted asks for confirmation on risky actions, while auto allow-all approves everything.
 
 ### Memory and Session Import
 
 Session and memory import commands accept the semantic JSONL interchange format, making it possible to bring saved session history or memory entries into Copilot CLI from an external export rather than starting from scratch.
+
+### Release Notes and Changelog
+
+The `/changelog` command lets you view release notes directly inside the CLI. Without arguments it shows the notes for the current build; pass a version number to retrieve notes for any other release — including versions older than the ones bundled with the CLI:
+
+```
+/changelog           # view release notes for the current CLI version
+/changelog 1.0.105   # retrieve release notes for a specific version
+```
+
+This is useful when you upgrade and want to review what changed, or when you need to audit when a specific behavior was introduced without leaving your terminal session.
+
+### Semantic Code Search Indexing
+
+The `/index` command manages **managed shared semantic code search indexing** for your repository. When indexing is enabled and your account is eligible, the CLI maintains a shared search index that powers the `codebase` tool's semantic search capabilities — finding code by meaning rather than just text matching.
+
+```
+/index         # check indexing status and configure
+/index start   # start indexing the current repository
+/index stop    # stop indexing
+```
+
+Managed shared tgrep indexing is enabled by default for eligible repositories. Use `/index` to inspect the current indexing state and troubleshoot if semantic search is not returning expected results. The index is stored centrally and shared across sessions, so you do not need to rebuild it each time you start a new session.
+
+> **When is indexing used?** When the `codebase` search tool runs a semantic query, it checks whether a repository index is available. If an index exists, results draw on the semantic index for richer matches. If no index is ready, the tool falls back to ripgrep-based text search. Indexing is most beneficial in large codebases where text search misses conceptually related code spread across many files.
 
 ### Command-Line Parsing
 
@@ -963,8 +1021,10 @@ This section collects settings and behaviors that **changed or were renamed** in
 - **Sandbox local network access is now allowed by default.** Earlier releases blocked localhost and private-network access from sandboxed commands. Current releases allow it, so commands can reach local services; turn off **Allow local network** in `/sandbox` if you want the stricter isolation. Linux sandboxing also requires `slirp4netns`, `nsenter`, `iptables`, `ip6tables`, `iptables-restore`, and `ip6tables-restore` on `PATH`.
 - **`copilot plugins` lost its cross-kind flags.** The `--kind`, `--scope`, `--mcp`, and `--skill` flags were removed; `copilot plugins list` is now an alias of `copilot plugin list` and reports only plugins. Scripts using `copilot plugins install --skill [--scope project]` should switch to `copilot skill add [--project]`, and scripts reading `.plugins` from `copilot plugins list --json` should expect a flat array instead of the previous `{ plugins, errors }` object.
 - **Auto allow-all mode requires experimental mode.** The previous `AUTO_APPROVAL` environment variable approach was removed in favor of `/experimental on` (or `--experimental`) plus `/allow-all auto`.
+- **Assisted Permissions no longer requires experimental mode.** Earlier releases required experimental features to be enabled before you could use Assisted permission mode. It is now available to all users directly from `/permissions`.
 - **Ctrl+D no longer queues messages.** It now uses its default terminal behavior; use **Ctrl+Q** or **Ctrl+Enter** to queue a message instead.
 - **The CLI's command-line parser was rewritten** (moving off Commander to a Rust-based grammar). As a result, some error and help wording changed, `copilot login --host` now works correctly, and `--max-autopilot-continues` no longer accepts scientific notation as a value.
+- **`--remote` and `--no-remote` startup flags were retired.** These flags no longer work. Use the clearer `--host` and `--connect` flags instead when you need to control how the CLI starts or connects in hosted or remote contexts.
 - **Model availability changes over time.** The model picker periodically retires older models; if a model you previously pinned in a custom agent or config disappears from `/model`, switch to a current model or a [family alias](#model-picker) instead.
 
 ## Common Questions

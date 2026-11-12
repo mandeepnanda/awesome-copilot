@@ -3,13 +3,12 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-22
+lastUpdated: 2026-11-01
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
   - automation
   - fundamentals
-relatedArticles:
   - ./building-custom-agents.md
   - ./what-are-agents-skills-instructions.md
 prerequisites:
@@ -139,6 +138,38 @@ EOF
 ```
 
 > **How it works**: If your hook writes `{"additionalContext": "..."}` to stdout and exits with code `0`, the text is prepended to the model prompt for this turn. The hook can also write both `additionalContext` and `response` — if `response` is present, that wins and the model call is skipped.
+
+### Agent-Scoped Hooks
+
+Custom agents can define hooks **directly in their frontmatter** using a `hooks` field. Agent-scoped hooks fire only when that specific agent is active — they don't run during sessions using a different agent or the default assistant. This lets you attach agent-specific automation logic alongside the agent's persona and tool configuration, keeping everything in one file.
+
+```yaml
+---
+name: 'Security Reviewer'
+description: 'Expert security auditor for OWASP vulnerabilities'
+model: Claude Sonnet 4
+tools: ['codebase', 'terminal', 'github']
+hooks:
+  preToolUse:
+    - type: command
+      bash: ".github/hooks/security-policy/check-tool.sh"
+      matcher: "^bash$"
+      timeoutSec: 10
+  sessionStart:
+    - type: command
+      bash: "echo 'Security review session started' >> ~/.copilot/audit.log"
+      timeoutSec: 5
+---
+
+You are an expert security auditor who reviews code for OWASP vulnerabilities...
+```
+
+Agent-scoped hooks use the same event names, fields, and semantics as `hooks.json` hooks. They are merged with any project-level hooks, so a `preToolUse` hook in the agent frontmatter runs alongside — not instead of — any `preToolUse` hooks from `.github/hooks/`.
+
+Use agent-scoped hooks when:
+- An agent has specific security or compliance requirements that shouldn't apply globally
+- You want to bundle automation logic with the agent so it travels as a unit (for example, inside a plugin)
+- Different agents in the same repository need different formatting or auditing behavior
 
 ### Extension Hooks Merging
 
