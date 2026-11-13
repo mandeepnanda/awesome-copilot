@@ -3,7 +3,7 @@ title: '06 · Connect to GitHub, Databases & APIs'
 description: 'Mirror the source chapter on MCP servers and external integrations for GitHub Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-10
+lastUpdated: 2026-11-13
 ---
 
 ![Chapter 06: MCP Servers](/images/learning-hub/copilot-cli-for-beginners/06/chapter-header.png)
@@ -204,7 +204,7 @@ The GitHub MCP server is built-in and requires no setup. Below are additional se
 
 > 💡 **The `.` path**: The `.` means "current directory". Copilot can access files relative to where you launched it. In a Codespace, this is your workspace root. You can also use an absolute path like `/workspaces/copilot-cli-for-beginners` if you prefer.
 
-Add this to your `~/.copilot/mcp-config.json` and restart Copilot.
+Add this to your `~/.copilot/mcp-config.json`. MCP configuration changes take effect between turns.
 
 </details>
 
@@ -233,7 +233,7 @@ Context7 gives Copilot access to up-to-date documentation for popular frameworks
 - ✅ **No account needed** 
 - ✅ **Your code stays local**
 
-Add this to your `~/.copilot/mcp-config.json` and restart Copilot.
+Add this to your `~/.copilot/mcp-config.json`. MCP configuration changes take effect between turns.
 
 </details>
 
@@ -282,7 +282,9 @@ copilot
 
 Copilot CLI includes a built-in `web_fetch` tool that can fetch content from any URL. This is useful for pulling in READMEs, API docs, or release notes without leaving your terminal. No MCP server needed.
 
-You can control which URLs are accessible via `~/.copilot/config.json` (general Copilot settings), which is separate from `~/.copilot/mcp-config.json` (MCP server definitions).
+You can control which URLs are accessible via `~/.copilot/settings.json` (general Copilot settings), which is separate from `~/.copilot/mcp-config.json` (MCP server definitions).
+
+> ⚠️ **Settings file location**: Copilot CLI reads user settings from `~/.copilot/settings.json`. The older `~/.copilot/config.json` file is no longer used for user settings. Any keys placed there will be silently ignored.
 
 ```json
 {
@@ -738,7 +740,7 @@ copilot
 
 **Expected result**: Copilot lists `book_app.py`, `books.py`, and `utils.py` with their functions.
 
-> 💡 **Don't have filesystem MCP configured yet?** Create the config file from the [Complete Configuration](#complete-configuration-file) section above. Then restart Copilot.
+> 💡 **Don't have filesystem MCP configured yet?** Create the config file from the [Complete Configuration](#complete-configuration-file) section above. MCP configuration changes take effect between turns.
 
 ---
 
