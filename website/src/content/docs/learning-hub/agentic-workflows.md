@@ -3,7 +3,7 @@ title: 'Agentic Workflows'
 description: 'Learn what GitHub Agentic Workflows are, how to use community workflows from Awesome Copilot, and how to contribute your own.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-27
+lastUpdated: 2026-11-13
 estimatedReadingTime: '7 minutes'
 tags:
   - workflows
@@ -207,6 +207,14 @@ gh aw compile --validate --no-emit workflows/my-new-workflow.md
 - **Descriptive names** — use lowercase filenames with hyphens (e.g., `daily-issues-report.md`)
 - **Test locally** — validate with `gh aw compile --validate` before submitting
 - **Document the purpose** — the `description` field should make it clear what the workflow does and when to use it
+
+## Running Workflows
+
+Agentic workflows can also be triggered directly from the CLI and GitHub.com. The `copilot workflow run` command supports signing in with a Microsoft 365 account alongside standard GitHub usage-based billing accounts and custom model providers (BYOK). This means organization-managed Microsoft 365 identities can trigger workflow runs without a separate GitHub account.
+
+### Dynamic Workflows Safety
+
+When experimental dynamic workflows are enabled, a workflow's own agent cannot start or resume additional runs of the same workflow. This built-in safeguard prevents a workflow from recursively spawning unlimited copies of itself, even when all tools are permitted. If you need a workflow to trigger another workflow, use a different workflow definition as the target.
 
 ## Learn More
 

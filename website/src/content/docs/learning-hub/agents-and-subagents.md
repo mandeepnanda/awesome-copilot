@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-11-02
+lastUpdated: 2026-11-13
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -143,6 +143,8 @@ In v1.0.64+, you can configure the rubber-duck agent (including its complementar
 ```
 /subagents          # open the subagents configuration panel
 ```
+
+When multiple custom agents share the same display name, `/subagents` shows each agent's unique ID alongside its name so you can tell them apart and configure the right one.
 
 Or you can still enable experimental features and select it from the agent picker:
 

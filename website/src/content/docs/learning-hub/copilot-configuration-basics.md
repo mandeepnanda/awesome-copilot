@@ -657,6 +657,12 @@ The `/chronicle` command opens an interactive timeline of everything the agent h
 
 Chronicle tracks which files were created, modified, or deleted during the session alongside the conversation that led to those changes. Use it to review what happened before a `/rewind`, audit what the agent changed, or share a summary of session activity with teammates.
 
+**`/chronicle cost-tips`** analyzes your session and account usage history to recommend cheaper models or reasoning settings based on how you work. It includes cost data from both CLI and Copilot App sessions, and surfaces recommendations sooner when local usage data is available:
+
+```
+/chronicle cost-tips
+```
+
 The `/chronicle skills review` subcommand opens an interactive review flow for proposed draft skill changes. When the agent has suggested additions or modifications to skills during a session, you can review each draft individually and choose to accept, reject, or defer:
 
 ```
@@ -710,6 +716,15 @@ The `/context` command shows a visualization of the current conversation's conte
 ```
 /context
 ```
+
+By default, Copilot CLI uses each model's recommended context window size. If you need a larger or smaller context, you can override this with `--context` when starting a session:
+
+```bash
+copilot --context large     # use a larger context window
+copilot --context small     # use a smaller (faster, cheaper) context window
+```
+
+Explicit context choices are preserved across sessions when you resume.
 
 The `/usage` command displays session metrics such as the number of tokens consumed, API calls made, and any quota information for the current session, including per-model token totals when you have used multiple models in a session:
 

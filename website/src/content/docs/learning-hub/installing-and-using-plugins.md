@@ -199,6 +199,21 @@ Pinning to a SHA guarantees that everyone on the team installs plugins from exac
 - **Change control** — review and approve plugin updates before rolling them out team-wide
 - **Stability** — prevent breaking changes in upstream marketplaces from impacting your team without notice
 
+You can also target a specific branch or tag using the `ref` field, or point at a subdirectory within a repository using `git-subdir`. These options let you structure a monorepo where plugins live alongside other code without requiring a dedicated repository per marketplace:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "ref": "v2",
+      "git-subdir": "plugins/copilot"
+    }
+  ]
+}
+```
+
 ## Installing Plugins
 
 ### From Copilot CLI
