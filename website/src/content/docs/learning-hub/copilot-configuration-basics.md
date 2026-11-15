@@ -852,6 +852,14 @@ copilot --no-sandbox -p "Set up development environment with system tools"
 
 These flags apply only to the current invocation — your persisted sandbox preference remains unchanged.
 
+The `--host-allow-session-creation` flag lets remote clients create sessions on a CLI host for a single launch, without permanently changing the saved remote-session setting:
+
+```bash
+copilot --host-allow-session-creation
+```
+
+This is useful when you want to temporarily open the host to a remote client (for example, an automated script or a team member connecting via `/remote`) without touching your saved configuration. The permission expires when the CLI process exits.
+
 **`allowDevToolAccess` sandbox setting**: When the sandbox is enabled, this setting grants sandboxed builds access to toolchain caches, registries, config files, and installs (npm cache, pip cache, Go module cache, etc.) so builds work without extra setup. Set it to `false` in `/settings` to opt out if you want a stricter sandbox that blocks all toolchain access. See [Compatibility and Migration Notes](#compatibility-and-migration-notes) if you have an older `allowDevToolCaches` value configured.
 
 **Sandbox auth settings**: The `/sandbox` configuration dialog groups git, `gh`, and (on macOS) keychain settings under an **Auth** tab, backed by the `sandbox.auth.git` and `sandbox.auth.gh` settings keys. See [Compatibility and Migration Notes](#compatibility-and-migration-notes) if you have the older `sandbox.gitAuth`/`sandbox.ghAuth` keys configured.
@@ -990,6 +998,26 @@ The `assistedApprovalInstructions` setting lets you supply your own guidance to 
 > **Autopilot + Assisted Permissions**: When Autopilot mode is active and Assisted Permissions is the current permission mode, the agent no longer pauses for permission prompts — the Assisted judge handles each tool request automatically without surfacing dialogs. Risky actions the judge declines are reported in the session output, letting the agent try an alternative approach without blocking. This means you can run long Autopilot sessions with the safety net of the Assisted judge without any manual intervention.
 
 > **Note**: The separate **auto allow-all** mode (activated with `/allow-all auto`) still requires experimental features to be enabled. Assisted Permissions and auto allow-all are two different modes: Assisted asks for confirmation on risky actions, while auto allow-all approves everything.
+
+### Enterprise-Managed Shell Permission Rules
+
+When an organization administrator configures managed Shell, Bash, or PowerShell permission rules for their enterprise, those rules now support **regular expressions**. This lets admins write a single pattern that matches a family of commands rather than listing every exact string:
+
+```json
+{
+  "managedPermissions": {
+    "shell": {
+      "allow": [
+        "^(npm|npx|yarn|pnpm) ",
+        "^git (status|log|diff|fetch|pull|push)",
+        "^make (test|build|lint)"
+      ]
+    }
+  }
+}
+```
+
+Regex rules are evaluated against the full command string; a command is allowed if any `allow` pattern matches, and denied if any `deny` pattern matches (deny takes precedence). Users in a managed enterprise environment will find that the permission prompt no longer appears for commands that match an administrator-configured allow pattern.
 
 ### Memory and Session Import
 

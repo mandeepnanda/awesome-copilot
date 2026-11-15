@@ -188,7 +188,25 @@ When hooks are defined inside a **plugin**, the hook scripts receive two additio
 | `CLAUDE_PROJECT_DIR` | The path to the current project (working) directory |
 | `CLAUDE_PLUGIN_DATA` | The path to a persistent data directory scoped to the plugin |
 
-You can also use these as **template variables** directly in the `bash` or `powershell` fields of your `hooks.json` configuration:
+The `${COPILOT_PLUGIN_ROOT}` environment variable is also expanded in plugin hook `cwd` (working directory) and `env` values. This lets hook entries reference paths relative to the plugin's own directory — for example, a hook that runs a script bundled alongside the plugin:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "${COPILOT_PLUGIN_ROOT}/scripts/init.sh",
+        "cwd": "${COPILOT_PLUGIN_ROOT}",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+You can also use `CLAUDE_PROJECT_DIR` and `CLAUDE_PLUGIN_DATA` as **template variables** directly in the `bash` or `powershell` fields of your `hooks.json` configuration:
 
 ```json
 {

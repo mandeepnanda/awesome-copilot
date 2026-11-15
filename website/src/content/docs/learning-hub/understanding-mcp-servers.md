@@ -112,6 +112,8 @@ You can also install a specific server by name directly:
 /mcp install @modelcontextprotocol/server-postgres
 ```
 
+**URL variable substitution**: Some registry servers advertise URL variables in their manifest (for example, a base URL or region endpoint). When you install such a server, `/mcp search` and `/mcp install` prompt you to enter values for each variable before writing the config — the CLI substitutes your values into the server's URL and args automatically, so you never need to hand-edit the resulting JSON entry.
+
 This guided flow is the recommended way to add new MCP servers, especially for servers that require multiple configuration values.
 
 ### Configuration Fields
