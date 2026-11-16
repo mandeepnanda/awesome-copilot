@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-11-09
+lastUpdated: 2026-11-16
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -338,6 +338,15 @@ You can also open the `/mcp` manager while the agent is working to toggle server
 
 **Toggling servers on and off**: From the `/mcp` list view, you can **enable or disable individual MCP servers** without editing your config file. Select a server in the list and toggle it — disabled servers won't start in future sessions and their tools won't be available to agents. This is useful for temporarily disabling a server that's causing slowdowns or errors without removing it from your configuration entirely.
 
+**Disabling the MCP tool snapshot cache**: By default, Copilot CLI caches each server's tool list (a snapshot) to avoid re-fetching it on every session start. If you're developing or debugging an MCP server and want to force a fresh tool list fetch every time, set `COPILOT_MCP_TOOL_CACHE=0` to turn off the snapshot cache for all servers:
+
+```bash
+export COPILOT_MCP_TOOL_CACHE=0
+copilot
+```
+
+This is a development aid; leave it unset in normal use.
+
 **Common causes and fixes**:
 
 | Symptom | Likely Cause | Fix |
@@ -346,6 +355,7 @@ You can also open the `/mcp` manager while the agent is working to toggle server
 | Auth errors / 401 | Expired or missing API key | Update the `env` field in your config; check `/mcp auth` |
 | Server starts then exits | Server crash | Check stderr output in the warning for the root cause |
 | Server blocked | Organization policy | Contact your admin; switch to an approved server |
+| Stale tool list after update | Tool snapshot cache | Set `COPILOT_MCP_TOOL_CACHE=0` to force a fresh fetch |
 
 ## Best Practices
 
