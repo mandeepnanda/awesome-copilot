@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-11-12
+lastUpdated: 2026-11-17
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -998,6 +998,22 @@ The `assistedApprovalInstructions` setting lets you supply your own guidance to 
 > **Autopilot + Assisted Permissions**: When Autopilot mode is active and Assisted Permissions is the current permission mode, the agent no longer pauses for permission prompts — the Assisted judge handles each tool request automatically without surfacing dialogs. Risky actions the judge declines are reported in the session output, letting the agent try an alternative approach without blocking. This means you can run long Autopilot sessions with the safety net of the Assisted judge without any manual intervention.
 
 > **Note**: The separate **auto allow-all** mode (activated with `/allow-all auto`) still requires experimental features to be enabled. Assisted Permissions and auto allow-all are two different modes: Assisted asks for confirmation on risky actions, while auto allow-all approves everything.
+
+### Enterprise-Managed Feature Flags
+
+Administrators can enable or disable specific built-in Copilot features across their enterprise using the `features` managed setting namespace. This lets organizations govern which capabilities are available to users without requiring individual configuration changes.
+
+**Disabling Browser Use**: To prevent users from using the built-in Browser Use capability (which lets Copilot control a browser to complete web-based tasks), set `features.browserUse` to `false`:
+
+```json
+{
+  "features": {
+    "browserUse": false
+  }
+}
+```
+
+This disables Browser Use for all sessions, including sessions already in progress when the policy change takes effect. Users in organizations where this is disabled will not see Browser Use as an available tool.
 
 ### Enterprise-Managed Shell Permission Rules
 
