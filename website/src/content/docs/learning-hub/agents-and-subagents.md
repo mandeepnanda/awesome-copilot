@@ -243,6 +243,8 @@ No. They can run sequentially when one step depends on another, or in parallel w
 
 Yes. In v1.0.66+, usage-based billing users can configure **subagent concurrency and depth limits** directly from `/settings`. The concurrency limit controls how many subagents run in parallel; the depth limit controls how many levels deep delegation can chain (preventing runaway recursive subagent trees). These settings give you predictable control over resource consumption during complex orchestrated tasks.
 
+Subagents also count against the session-wide AI credit limit set with `--max-ai-credits`. Previously, only the main agent's turns consumed from that budget; each subagent's work now contributes to the same limit, so the ceiling you set applies to the whole orchestrated session.
+
 ## Next steps
 
 - Read [Building Custom Agents](../building-custom-agents/) to design coordinator and worker agents.

@@ -366,12 +366,13 @@ This is a development aid; leave it unset in normal use.
 - **Test server connectivity**: Verify MCP servers start correctly before relying on them in agent workflows. Use `/mcp show` to check status and read stderr output in any failure warnings.
 - **Use the MCP allowlist (experimental)**: In high-security environments, the `MCP_ALLOWLIST` feature flag lets you validate MCP servers against a configured registry, blocking unrecognized servers from loading. MCP servers that are blocked by the allowlist policy are **hidden from `/mcp show`** to avoid confusion — only permitted servers appear in that view. This is an experimental feature for enterprise environments requiring strict control over which MCP servers are permitted.
 
-### Organization Policy for Third-Party MCP Servers
+### Organization Policy for MCP Servers
 
-GitHub organizations can enforce a policy that restricts which third-party MCP servers members are permitted to use. When this policy is active:
+GitHub organizations can enforce a policy that restricts which MCP servers members are permitted to use. When this policy is active:
 
 - Copilot CLI **enforces** the policy for all users in the organization.
 - A **warning is shown** if a configured MCP server is blocked by the policy, so you know which servers are restricted before expecting them to work.
+- The **built-in GitHub MCP server** is also unavailable when the organization's policy disables MCP servers — it is not exempt from the org-level restriction.
 
 If you see a warning that an MCP server is blocked, contact your organization administrator to find out which servers are on the allowlist, or switch to an approved alternative.
 
