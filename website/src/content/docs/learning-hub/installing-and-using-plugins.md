@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-22
+lastUpdated: 2026-11-12
 relatedArticles:
   - ./building-custom-agents.md
   - ./creating-effective-skills.md
@@ -159,6 +159,8 @@ To automatically register an additional marketplace for everyone working in a re
 
 With this in place, team members automatically get the `my-org-plugins` marketplace available without running a separate `marketplace add` command.
 
+**Managed plugin assignments with `defaultEnabled`**: Organization administrators can publish plugins with a `state` of `"defaultEnabled"` in their marketplace. When a user syncs from a marketplace that includes such assignments, those plugins are automatically installed and activated — without requiring each user to explicitly run `plugin install`. User overrides (manual disables) are preserved; if a user has explicitly disabled a plugin, `defaultEnabled` respects that choice and does not re-enable it. This is useful for deploying a standard toolset to your whole organization without requiring individual opt-in.
+
 **Auto-updating team marketplaces**: Set `"autoUpdate": true` on an `extraKnownMarketplaces` entry to have that marketplace's plugins update automatically at the start of each session, without requiring a manual `copilot plugin marketplace update` or `copilot plugin update`:
 
 ```json
@@ -196,6 +198,21 @@ Pinning to a SHA guarantees that everyone on the team installs plugins from exac
 - **Reproducible CI environments** — ensure builds always use the same plugin versions
 - **Change control** — review and approve plugin updates before rolling them out team-wide
 - **Stability** — prevent breaking changes in upstream marketplaces from impacting your team without notice
+
+You can also target a specific branch or tag using the `ref` field, or point at a subdirectory within a repository using `git-subdir`. These options let you structure a monorepo where plugins live alongside other code without requiring a dedicated repository per marketplace:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "ref": "v2",
+      "git-subdir": "plugins/copilot"
+    }
+  ]
+}
+```
 
 ## Installing Plugins
 

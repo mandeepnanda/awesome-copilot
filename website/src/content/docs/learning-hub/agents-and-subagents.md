@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-09-12
+lastUpdated: 2026-11-13
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -144,6 +144,8 @@ In v1.0.64+, you can configure the rubber-duck agent (including its complementar
 /subagents          # open the subagents configuration panel
 ```
 
+When multiple custom agents share the same display name, `/subagents` shows each agent's unique ID alongside its name so you can tell them apart and configure the right one.
+
 Or you can still enable experimental features and select it from the agent picker:
 
 ```
@@ -202,6 +204,27 @@ This pairs with **improved workspace resolution**: agents can resolve a workspac
 
 **Shareable session links** *(VS Code 1.138+)*: Agent Host sessions and chats now provide browser-addressable links, so you can reopen or share a specific Agents window session directly from another app, a GitHub issue, or terminal output — useful when handing off a delegated subagent's work to a teammate for review. You can also start a new session beside the current one in one step, keeping the current work visible while a second session starts.
 
+## Session management tools and @mentions (Copilot CLI)
+
+Copilot CLI exposes an opt-in set of **session management tools** that let agents and ACP clients manage local sessions programmatically — listing, resuming, and inspecting sessions without leaving an active conversation. Once a local session is opted in, it also becomes **@mentionable** inside other sessions, so one agent can reference and cross-link to another running session by name.
+
+To opt in a session for external management, enable it from inside the session:
+
+```
+/session share        # opt this session in to external management and @mentions
+/session unshare      # remove this session from external management
+```
+
+When a session is shared, ACP clients (tools like Zed, Neovim plugins, and IDE integrations built on the Agent Coordination Protocol) can include it in session listings, attach to it, and display its progress. The session also becomes @mentionable in other CLI sessions, enabling cross-session references:
+
+```
+@my-backend-session show me the current error output
+```
+
+This is particularly useful in multi-agent workflows where a coordinating agent needs to observe or steer a subordinate session, or when you want to track several long-running background sessions simultaneously.
+
+> **Note**: Session sharing is opt-in by default. Local sessions are not exposed to external management unless you explicitly share them, keeping unrelated sessions private.
+
 ## Common questions
 
 **Do users always invoke subagents directly?**
@@ -219,6 +242,8 @@ No. They can run sequentially when one step depends on another, or in parallel w
 **Can I control how many subagents run simultaneously?**
 
 Yes. In v1.0.66+, usage-based billing users can configure **subagent concurrency and depth limits** directly from `/settings`. The concurrency limit controls how many subagents run in parallel; the depth limit controls how many levels deep delegation can chain (preventing runaway recursive subagent trees). These settings give you predictable control over resource consumption during complex orchestrated tasks.
+
+Subagents also count against the session-wide AI credit limit set with `--max-ai-credits`. Previously, only the main agent's turns consumed from that budget; each subagent's work now contributes to the same limit, so the ceiling you set applies to the whole orchestrated session.
 
 ## Next steps
 
